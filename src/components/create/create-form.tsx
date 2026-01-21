@@ -1,4 +1,3 @@
-
 import { useForm, useFieldArray } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -18,7 +17,6 @@ import {
   FormMessage,
 } from "../ui/form"
 
-
 const recipeSchema = z.object({
   title: z.string().min(1, "Recipe title is required"),
   description: z.string().min(1, "Description is required"),
@@ -33,13 +31,12 @@ const recipeSchema = z.object({
 
 type RecipeFormValues = z.infer<typeof recipeSchema>
 
-
 export default function CreateForm() {
   const addRecipe = useRecipeStore(state => state.addRecipe)
   const navigate = useNavigate()
 
   const form = useForm<RecipeFormValues>({
-    resolver: zodResolver(recipeSchema),
+    resolver: zodResolver(recipeSchema) as any,
     defaultValues: {
       title: "",
       description: "",
@@ -65,10 +62,9 @@ export default function CreateForm() {
   }
 
   return (
-    <Form<RecipeFormValues> {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5 max-w-md">
 
-        {}
         <FormField
           control={control}
           name="title"
@@ -83,7 +79,6 @@ export default function CreateForm() {
           )}
         />
 
-        {}
         <FormField
           control={control}
           name="description"
@@ -98,7 +93,6 @@ export default function CreateForm() {
           )}
         />
 
-        {}
         <div className="space-y-3">
           <p className="font-semibold">Ingredients</p>
 
