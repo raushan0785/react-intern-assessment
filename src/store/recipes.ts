@@ -1,6 +1,6 @@
+
 import { dummyData } from '@/data';
 import { create } from 'zustand'
-
 
 export type IngredientType = {
     name: string;
@@ -17,30 +17,54 @@ export type RecipeType = {
 
 interface RecipeState {
     recipes: RecipeType[]
+    archivedRecipes: RecipeType[]
 
     addRecipe: (recipe: RecipeType) => void;
+    deleteRecipe: (id: string) => void;
+    archiveRecipe: (id: string) => void;
+    unarchiveRecipe: (id: string) => void;
     findRecipe: (id: string) => RecipeType | undefined;
 }
 
-export const useRecipeStore = create<RecipeState>()((set, get) => {
-    return {
-        recipes: dummyData,
+export const useRecipeStore = create<RecipeState>()((set, get) => ({
+    recipes: dummyData,
+    archivedRecipes: [],
 
-        addRecipe: (recipe: RecipeType) => {
-            const currentRecpie: RecipeType[] = get().recipes
-            set(
-                {
-                    recipes: [...currentRecpie, recipe]
-                }
-            )
-        },
+    addRecipe: (recipe) => {
+        set((state) => ({
+            recipes: [...state.recipes, recipe],
+        }))
+    },
 
-        findRecipe: (id: string) => {
-            let recipe = undefined
-            const recipes = get().recipes
-            recipe = recipes.find((recipe) => recipe.id === id)
-            return recipe
-        }
-    }
-})
+    deleteRecipe: (id) => {
+        set((state) => ({
+            recipes: state.recipes.filter(r => r.id !== id),
+            archivedRecipes: state.archivedRecipes.filter(r => r.id !== id),
+        }))
+    },
+
+    archiveRecipe: (id) => {
+        const recipe = get().recipes.find(r => r.id === id)
+        if (!recipe) return
+
+        set((state) => ({
+            recipes: state.recipes.filter(r => r.id !== id),
+            archivedRecipes: [...state.archivedRecipes, recipe],
+        }))
+    },
+
+    unarchiveRecipe: (id) => {
+        const recipe = get().archivedRecipes.find(r => r.id === id)
+        if (!recipe) return
+
+        set((state) => ({
+            archivedRecipes: state.archivedRecipes.filter(r => r.id !== id),
+            recipes: [...state.recipes, recipe],
+        }))
+    },
+
+    findRecipe: (id) => {
+        return get().recipes.find(r => r.id === id)
+    },
+}));
 
